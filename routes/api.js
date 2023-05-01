@@ -45,7 +45,22 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   console.log("LOGGING IN USER");
   try {
+    const authHeader = req.headers.authorization;
     const { email, password } = req.body;
+
+    // Auth via JWT
+    if (authHeader) {
+      try {
+        const decodedToken = jwt.verify(authHeader, jwtSecret);
+        const userId = decodedToken.userId;
+        const user = await User.findById(userId);
+        const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
+        const { password: pw, access_token, ...rest } = user.toObject();
+        return res.status(200).json({ userData: rest, token, message: "User logged in successfully" });
+      } catch (e) {
+        return res.status(400).json({ message: "Invalid JWT. Please log in with un/pw." });
+      }
+    }
 
     // Find the user by email
     const user = await User.findOne({ email });
@@ -61,7 +76,8 @@ router.post("/login", async (req, res) => {
 
     // Sign a JWT token
     const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
-    res.status(200).json({ token, message: "User logged in successfully" });
+    const { password: pw, access_token, ...rest } = user.toObject();
+    return res.status(200).json({ userData: rest, token, message: "User logged in successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
