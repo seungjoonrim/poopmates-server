@@ -15,11 +15,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  poopingStatus: {
+  isPooping: {
     type: Boolean,
     default: false
   },
-  poopingStatusExpiresAt: {
+  isPoopingExpiresAt: {
     type: Date,
     default: null
   },

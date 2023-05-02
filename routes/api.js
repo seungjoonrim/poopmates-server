@@ -84,7 +84,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Get user profile
-router.get("/profile/:userId", async (req, res) => {
+router.get("/users/:userId", async (req, res) => {
   console.log("GETTING USER");
   try {
     const user = await User.findById(req.params.userId).select("-password");
@@ -95,6 +95,30 @@ router.get("/profile/:userId", async (req, res) => {
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Set isPooping
+router.patch("/users/:userId/update-status", async (req, res) => {
+  console.log("UPDATING STATUS");
+  const { userId } = req.params;
+  const { isPooping, isPoopingExpiresAt } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isPooping, isPoopingExpiresAt },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    res.send(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'An error occurred while updating the status' });
   }
 });
 
