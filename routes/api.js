@@ -122,6 +122,22 @@ router.patch("/users/:userId/update-status", async (req, res) => {
   }
 });
 
+router.get("/search", async (req, res) => {
+  console.log("SEARCHING");
+  const searchTerm = req.query.q;
+
+  try {
+    const users = await User.find({
+      username: new RegExp(searchTerm, 'i'),
+    }).select('-password -__v');
+
+    res.json(users);
+  } catch (error) {
+    console.error('Error searching for users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Friend request
 router.post("/send-friend-request/:userId/:friendId", async (req, res) => {
   console.log("SENDING FRIEND REQUEST");
