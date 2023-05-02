@@ -122,6 +122,7 @@ router.patch("/users/:userId/update-status", async (req, res) => {
   }
 });
 
+// Search for other users
 router.get("/search", async (req, res) => {
   console.log("SEARCHING");
   const searchTerm = req.query.q;
