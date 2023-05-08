@@ -173,6 +173,7 @@ router.post("/accept-friend-request/:userId/:friendId", async (req, res) => {
     if (user.friendRequests.includes(friend._id)) {
       user.friends.push(friend._id);
       user.friendRequests.pull(friend._id);
+      friend.friendRequests.pull(user._id);
       friend.friends.push(user._id);
       await user.save();
       await friend.save();
