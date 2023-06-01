@@ -149,6 +149,10 @@ router.post("/send-friend-request/:userId/:friendId", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (user.friends.includes(friend._id)) {
+      return res.status(404).json({ message: "Already friends" });
+    }
+
     if (!friend.friendRequests.includes(user._id)) {
       friend.friendRequests.push(user._id);
       await friend.save();
@@ -170,7 +174,7 @@ router.post("/accept-friend-request/:userId/:friendId", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.friendRequests.includes(friend._id)) {
+    if (user.friendRequests.includes(friend._id) && !user.friends.includes(friend._id)) {
       user.friends.push(friend._id);
       user.friendRequests.pull(friend._id);
       friend.friendRequests.pull(user._id);
